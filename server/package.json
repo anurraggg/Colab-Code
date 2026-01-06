@@ -26,9 +26,7 @@
     "socket.io": "^4.8.3",
     "ws": "^8.19.0",
     "y-websocket": "^3.0.0",
-    "yjs": "^13.6.29"
-  },
-  "devDependencies": {
+    "yjs": "^13.6.29",
     "@types/connect-sqlite3": "^0.9.6",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
