@@ -11,6 +11,8 @@ import { setupWSConnection } from './yjsHandler';
 import './auth'; // Register strategies
 
 const app = express();
+app.set('trust proxy', 1); // Trust first proxy (Render/Vercel)
+
 const SQLiteStoreSession = (SQLiteStore(session) as any);
 
 const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:5173";
@@ -27,7 +29,11 @@ app.use(session({
     secret: process.env.SESSION_SECRET || 'keyboard cat',
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: process.env.NODE_ENV === 'production' } // Set to true if using HTTPS
+    cookie: {
+        secure: process.env.NODE_ENV === 'production', // Required for SameSite=None
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // Required for Cross-Site (Vercel -> Render)
+        maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    }
 }));
 
 app.use(passport.initialize());
