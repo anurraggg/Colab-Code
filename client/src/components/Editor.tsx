@@ -131,12 +131,21 @@ export const CodeEditor: React.FC<EditorProps> = ({ roomId, user }) => {
         if (!editorRef.current || !yOutput) return;
         setIsRunning(true);
 
-        // Optimistic update
+        const sourceCode = editorRef.current.getValue();
+        const currentLang = languageRef.current;
+
+        // Handle HTML/CSS Preview locally
+        if (currentLang === 'html') {
+            yOutput.delete(0, yOutput.length);
+            yOutput.insert(0, sourceCode); // Store HTML directly in output
+            setIsRunning(false);
+            return;
+        }
+
+        // Optimistic update for backend languages
         yOutput.delete(0, yOutput.length);
         yOutput.insert(0, 'Running...');
 
-        const sourceCode = editorRef.current.getValue();
-        const currentLang = languageRef.current;
         const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
         try {
@@ -246,8 +255,17 @@ export const CodeEditor: React.FC<EditorProps> = ({ roomId, user }) => {
             {/* Output Panel */}
             <div className="output-panel">
                 <div className="output-header">Terminal Output</div>
-                <div className="output-content">
-                    {output || <span style={{ color: '#444' }}>// Output will appear here...</span>}
+                <div className="output-content" style={{ padding: language === 'html' ? 0 : '1rem', background: language === 'html' ? '#fff' : 'transparent' }}>
+                    {language === 'html' ? (
+                        <iframe
+                            srcDoc={output}
+                            title="preview"
+                            style={{ width: '100%', height: '100%', border: 'none' }}
+                            sandbox="allow-scripts"
+                        />
+                    ) : (
+                        output || <span style={{ color: '#444' }}>// Output will appear here...</span>
+                    )}
                 </div>
             </div>
         </div>
