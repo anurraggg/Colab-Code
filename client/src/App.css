@@ -688,7 +688,22 @@ h2 {
   min-width: 0;
 }
 
+.tab-bar {
+  order: 1;
+  flex-shrink: 0;
+  background-color: rgba(255, 0, 0, 0.2) !important;
+  /* DEBUG */
+}
+
+.editor-toolbar {
+  order: 2;
+  flex-shrink: 0;
+  background-color: rgba(0, 255, 0, 0.2) !important;
+  /* DEBUG */
+}
+
 .code-editor-wrapper {
+  order: 3;
   flex: 1;
   position: relative;
   overflow: hidden;
@@ -696,20 +711,12 @@ h2 {
   display: flex;
   flex-direction: column;
   background-color: rgba(0, 0, 255, 0.2);
-  /* DEBUG: Blue tint */
-}
-
-.tab-bar {
-  background-color: rgba(255, 0, 0, 0.2) !important;
-  /* DEBUG: Red tint */
-}
-
-.editor-toolbar {
-  background-color: rgba(0, 255, 0, 0.2) !important;
-  /* DEBUG: Green tint */
+  /* DEBUG */
 }
 
 .output-panel {
+  order: 4;
+  flex-shrink: 0;
   background-color: rgba(255, 255, 0, 0.2) !important;
-  /* DEBUG: Yellow tint */
+  /* DEBUG */
 }
