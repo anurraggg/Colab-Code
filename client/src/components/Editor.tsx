@@ -1,12 +1,13 @@
-import React, { useRef, useEffect, useState } from 'react';
-import Editor, { type OnMount } from '@monaco-editor/react';
-import * as Y from 'yjs';
-import { WebsocketProvider } from 'y-websocket';
-import { MonacoBinding } from 'y-monaco';
+// import React, { useRef, useEffect, useState } from 'react';
+import React from 'react';
+// import Editor, { type OnMount } from '@monaco-editor/react';
+// import * as Y from 'yjs';
+// import { WebsocketProvider } from 'y-websocket';
+// import { MonacoBinding } from 'y-monaco';
 import { FileExplorer } from './FileExplorer';
 import { TabBar } from './TabBar';
-import type { FileNode, FileTree, User } from '../types';
-import { v4 as uuidv4 } from 'uuid';
+import type { FileTree, User } from '../types';
+// import { v4 as uuidv4 } from 'uuid';
 
 interface EditorProps {
     roomId: string;
@@ -15,50 +16,44 @@ interface EditorProps {
 
 
 
-const getRandomColor = () => {
+/* const getRandomColor = () => {
     const colors = ['#f44336', '#e91e63', '#9c27b0', '#673ab7', '#3f51b5', '#2196f3', '#03a9f4', '#00bcd4', '#009688', '#4caf50', '#8bc34a', '#cddc39', '#ffeb3b', '#ffc107', '#ff9800', '#ff5722'];
     return colors[Math.floor(Math.random() * colors.length)];
-};
+}; */
 
-export const CodeEditor: React.FC<EditorProps> = ({ roomId, user }) => {
-    const editorRef = useRef<any>(null);
-    const [provider, setProvider] = useState<WebsocketProvider | null>(null);
-    const [binding, setBinding] = useState<MonacoBinding | null>(null);
-    const [doc, setDoc] = useState<Y.Doc | null>(null);
-
-    // File System State
-    const [files, setFiles] = useState<FileTree>({});
-    const [activeFileId, setActiveFileId] = useState<string | null>(null);
-    const [openFiles, setOpenFiles] = useState<string[]>([]);
-
-    const [language, setLanguage] = useState('javascript');
-    const [yOutput, setYOutput] = useState<Y.Text | null>(null);
-    const [activeUsers, setActiveUsers] = useState<any[]>([]);
-    const [output, setOutput] = useState<string>('');
-    const [isRunning, setIsRunning] = useState(false);
+export const CodeEditor: React.FC<EditorProps> = ({ /* roomId, user */ }) => {
+    // Temporary dummy state for rendering
+    const files: FileTree = {};
+    const activeFileId = null;
+    const openFiles: string[] = [];
+    const language: string = 'javascript';
+    const activeUsers: any[] = [];
+    const output = '';
+    const isRunning = false;
 
     // Refs
+    /* const editorRef = useRef<any>(null);
     const languageRef = useRef(language);
     const runCodeRef = useRef<() => void>(() => { });
-    const activeFileIdRef = useRef(activeFileId);
+    const activeFileIdRef = useRef(activeFileId); */
 
-    useEffect(() => {
+    /* useEffect(() => {
         languageRef.current = language;
     }, [language]);
 
     useEffect(() => {
         activeFileIdRef.current = activeFileId;
-    }, [activeFileId]);
+    }, [activeFileId]); */
 
-    useEffect(() => {
+    /* useEffect(() => {
         return () => {
             if (provider) provider.destroy();
             if (binding) binding.destroy();
             if (doc) doc.destroy();
         };
-    }, []);
+    }, []); */
 
-    const handleEditorDidMount: OnMount = (editor, monaco) => {
+    /* const handleEditorDidMount: OnMount = (editor, monaco) => {
         editorRef.current = editor;
         const ydoc = new Y.Doc();
         setDoc(ydoc);
@@ -114,10 +109,10 @@ export const CodeEditor: React.FC<EditorProps> = ({ roomId, user }) => {
         editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, () => {
             runCodeRef.current();
         });
-    };
+    }; */
 
     // Handle File Switching
-    useEffect(() => {
+    /* useEffect(() => {
         if (!doc || !provider || !editorRef.current || !activeFileId) return;
 
         // Destroy old binding
@@ -142,18 +137,18 @@ export const CodeEditor: React.FC<EditorProps> = ({ roomId, user }) => {
         );
         setBinding(monacoBinding);
 
-    }, [activeFileId, doc, provider, files]); // Re-run when active file changes
+    }, [activeFileId, doc, provider, files]); // Re-run when active file changes */
 
     // Set initial active file
-    useEffect(() => {
+    /* useEffect(() => {
         if (!activeFileId && Object.keys(files).length > 0) {
             const firstFileId = Object.keys(files)[0];
             setActiveFileId(firstFileId);
             setOpenFiles([firstFileId]);
         }
-    }, [files]);
+    }, [files]); */
 
-    const handleFileSelect = (fileId: string) => {
+    /* const handleFileSelect = (fileId: string) => {
         setActiveFileId(fileId);
         if (!openFiles.includes(fileId)) {
             setOpenFiles([...openFiles, fileId]);
@@ -204,9 +199,13 @@ export const CodeEditor: React.FC<EditorProps> = ({ roomId, user }) => {
         if (activeFileId === fileId) {
             setActiveFileId(newOpen.length > 0 ? newOpen[0] : null);
         }
-    };
+    }; */
+    const handleFileSelect = () => { };
+    const handleCreateFile = () => { };
+    const handleDeleteFile = () => { };
+    const handleCloseTab = () => { };
 
-    const runCode = async () => {
+    /* const runCode = async () => {
         if (!editorRef.current || !yOutput || !activeFileId) return;
         setIsRunning(true);
 
@@ -262,7 +261,8 @@ export const CodeEditor: React.FC<EditorProps> = ({ roomId, user }) => {
     // Update ref so shortcut calls latest version
     useEffect(() => {
         runCodeRef.current = runCode;
-    }, [runCode]);
+    }, [runCode]); */
+    const runCode = () => { };
 
     return (
         <div className="editor-container" style={{ height: 'calc(100vh - 60px)' }}>
@@ -326,7 +326,10 @@ export const CodeEditor: React.FC<EditorProps> = ({ roomId, user }) => {
                 </div>
 
                 <div className="code-editor-wrapper">
-                    <Editor
+                    <div style={{ width: '100%', height: '100%', background: 'blue', color: 'white', fontSize: '2rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        TEST EDITOR COMPONENT
+                    </div>
+                    {/* <Editor
                         height="100%"
                         loading="Loading Editor..."
                         language={language}
@@ -342,7 +345,7 @@ export const CodeEditor: React.FC<EditorProps> = ({ roomId, user }) => {
                             scrollBeyondLastLine: false,
                             padding: { top: 16, bottom: 16 },
                         }}
-                    />
+                    /> */}
                 </div>
 
                 {/* Output Panel */}
