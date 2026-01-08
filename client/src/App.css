@@ -679,6 +679,8 @@ h2 {
   height: 100%;
   /* Fill the parent */
   overflow: hidden;
+  border: 2px solid red;
+  /* DEBUG */
 }
 
 .editor-main {
@@ -690,4 +692,6 @@ h2 {
   /* Ensure background is set */
   min-width: 0;
   /* Prevent flex overflow */
+  border: 2px solid blue;
+  /* DEBUG */
 }
