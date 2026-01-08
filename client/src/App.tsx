@@ -162,7 +162,7 @@ function App() {
           </div>
         </div>
       ) : (
-        <div className="editor-container">
+        <>
           <header className="app-header">
             <div className="header-left">
               <h3>Room: {roomId}</h3>
@@ -183,7 +183,7 @@ function App() {
             </div>
           </header>
           <CodeEditor roomId={roomId} user={user} />
-        </div>
+        </>
       )}
     </div>
   );
