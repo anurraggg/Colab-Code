@@ -671,7 +671,6 @@ h2 {
 }
 
 /* Layout Adjustments */
-/* Layout Adjustments */
 .editor-container {
   display: flex;
   flex: 1;
@@ -694,7 +693,23 @@ h2 {
   position: relative;
   overflow: hidden;
   min-height: 0;
-  /* Crucial for nested flex scrolling */
   display: flex;
   flex-direction: column;
+  background-color: rgba(0, 0, 255, 0.2);
+  /* DEBUG: Blue tint */
+}
+
+.tab-bar {
+  background-color: rgba(255, 0, 0, 0.2) !important;
+  /* DEBUG: Red tint */
+}
+
+.editor-toolbar {
+  background-color: rgba(0, 255, 0, 0.2) !important;
+  /* DEBUG: Green tint */
+}
+
+.output-panel {
+  background-color: rgba(255, 255, 0, 0.2) !important;
+  /* DEBUG: Yellow tint */
 }
