@@ -325,12 +325,10 @@ export const CodeEditor: React.FC<EditorProps> = ({ roomId, user }) => {
                     </div>
                 </div>
 
-                <div style={{ flex: 1, position: 'relative', border: '2px solid green' }}>
-                    <div style={{ position: 'absolute', top: 0, left: 0, color: 'red', zIndex: 100 }}>
-                        DEBUG: Editor Wrapper (Active File: {activeFileId})
-                    </div>
+                <div className="code-editor-wrapper">
                     <Editor
                         height="100%"
+                        loading="Loading Editor..."
                         language={language}
                         defaultValue="// Select a file to start coding..."
                         theme="vs-dark"
