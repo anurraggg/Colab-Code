@@ -80,10 +80,8 @@ function App() {
     window.location.href = '/';
   };
 
-  if (loading) return <div className="app-container">Loading...</div>;
-
   if (!user) {
-    return <Login />;
+    return <Login loading={loading} />;
   }
 
   return (
