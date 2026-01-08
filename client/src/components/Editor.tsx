@@ -265,101 +265,99 @@ export const CodeEditor: React.FC<EditorProps> = ({ roomId, user }) => {
     }, [runCode]);
 
     return (
-        <div style={{ height: 'calc(100vh - 60px)', width: '100%', display: 'flex', flexDirection: 'column' }}>
-            <div className="editor-container">
-                {/* File Explorer Sidebar */}
-                <FileExplorer
-                    files={files}
+        <div className="editor-container" style={{ height: 'calc(100vh - 60px)' }}>
+            {/* File Explorer Sidebar */}
+            <FileExplorer
+                files={files}
+                activeFileId={activeFileId}
+                onFileSelect={handleFileSelect}
+                onCreateFile={handleCreateFile}
+                onDeleteFile={handleDeleteFile}
+            />
+
+            {/* Main Editor Area */}
+            <div className="editor-main">
+                <TabBar
+                    openFiles={openFiles}
                     activeFileId={activeFileId}
-                    onFileSelect={handleFileSelect}
-                    onCreateFile={handleCreateFile}
-                    onDeleteFile={handleDeleteFile}
+                    files={files}
+                    onSelect={handleFileSelect}
+                    onClose={handleCloseTab}
                 />
 
-                {/* Main Editor Area */}
-                <div className="editor-main">
-                    <TabBar
-                        openFiles={openFiles}
-                        activeFileId={activeFileId}
-                        files={files}
-                        onSelect={handleFileSelect}
-                        onClose={handleCloseTab}
-                    />
-
-                    <div className="editor-toolbar">
-                        <div className="toolbar-left">
-                            <span style={{ color: '#888', fontSize: '0.9rem', marginRight: '10px' }}>
-                                {language.toUpperCase()}
-                            </span>
-                            <button
-                                onClick={runCode}
-                                disabled={isRunning}
-                                title="Ctrl+Enter to run"
-                                className="run-btn"
-                            >
-                                {isRunning ? (
-                                    <>
-                                        <span className="spinner">⌛</span> Running...
-                                    </>
-                                ) : (
-                                    <>
-                                        <span>▶</span> Run Code
-                                    </>
-                                )}
-                            </button>
-                        </div>
-
-                        <div className="active-users">
-                            <span style={{ color: '#888', marginRight: '10px', fontSize: '0.8rem' }}>Active:</span>
-                            {activeUsers.map((u, i) => (
-                                <div key={i} title={u.name} className="active-user-avatar" style={{
-                                    borderColor: u.color,
-                                    boxShadow: `0 0 10px ${u.color}40`
-                                }}>
-                                    {u.avatar ? (
-                                        <img src={u.avatar} alt={u.name} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
-                                    ) : (
-                                        u.name.charAt(0).toUpperCase()
-                                    )}
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-
-                    <div style={{ flex: 1, position: 'relative' }}>
-                        <Editor
-                            height="100%"
-                            language={language}
-                            defaultValue="// Select a file to start coding..."
-                            theme="vs-dark"
-                            onMount={handleEditorDidMount}
-                            options={{
-                                minimap: { enabled: false },
-                                fontSize: 14,
-                                fontFamily: "'JetBrains Mono', monospace",
-                                fontLigatures: true,
-                                automaticLayout: true,
-                                scrollBeyondLastLine: false,
-                                padding: { top: 16, bottom: 16 },
-                            }}
-                        />
-                    </div>
-
-                    {/* Output Panel */}
-                    <div className="output-panel">
-                        <div className="output-header">Terminal Output</div>
-                        <div className="output-content" style={{ padding: language === 'html' ? 0 : '1rem', background: language === 'html' ? '#fff' : 'transparent' }}>
-                            {language === 'html' ? (
-                                <iframe
-                                    srcDoc={output}
-                                    title="preview"
-                                    style={{ width: '100%', height: '100%', border: 'none' }}
-                                    sandbox="allow-scripts"
-                                />
+                <div className="editor-toolbar">
+                    <div className="toolbar-left">
+                        <span style={{ color: '#888', fontSize: '0.9rem', marginRight: '10px' }}>
+                            {language.toUpperCase()}
+                        </span>
+                        <button
+                            onClick={runCode}
+                            disabled={isRunning}
+                            title="Ctrl+Enter to run"
+                            className="run-btn"
+                        >
+                            {isRunning ? (
+                                <>
+                                    <span className="spinner">⌛</span> Running...
+                                </>
                             ) : (
-                                output || <span style={{ color: '#444' }}>// Output will appear here...</span>
+                                <>
+                                    <span>▶</span> Run Code
+                                </>
                             )}
-                        </div>
+                        </button>
+                    </div>
+
+                    <div className="active-users">
+                        <span style={{ color: '#888', marginRight: '10px', fontSize: '0.8rem' }}>Active:</span>
+                        {activeUsers.map((u, i) => (
+                            <div key={i} title={u.name} className="active-user-avatar" style={{
+                                borderColor: u.color,
+                                boxShadow: `0 0 10px ${u.color}40`
+                            }}>
+                                {u.avatar ? (
+                                    <img src={u.avatar} alt={u.name} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
+                                ) : (
+                                    u.name.charAt(0).toUpperCase()
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                <div style={{ flex: 1, position: 'relative' }}>
+                    <Editor
+                        height="100%"
+                        language={language}
+                        defaultValue="// Select a file to start coding..."
+                        theme="vs-dark"
+                        onMount={handleEditorDidMount}
+                        options={{
+                            minimap: { enabled: false },
+                            fontSize: 14,
+                            fontFamily: "'JetBrains Mono', monospace",
+                            fontLigatures: true,
+                            automaticLayout: true,
+                            scrollBeyondLastLine: false,
+                            padding: { top: 16, bottom: 16 },
+                        }}
+                    />
+                </div>
+
+                {/* Output Panel */}
+                <div className="output-panel">
+                    <div className="output-header">Terminal Output</div>
+                    <div className="output-content" style={{ padding: language === 'html' ? 0 : '1rem', background: language === 'html' ? '#fff' : 'transparent' }}>
+                        {language === 'html' ? (
+                            <iframe
+                                srcDoc={output}
+                                title="preview"
+                                style={{ width: '100%', height: '100%', border: 'none' }}
+                                sandbox="allow-scripts"
+                            />
+                        ) : (
+                            output || <span style={{ color: '#444' }}>// Output will appear here...</span>
+                        )}
                     </div>
                 </div>
             </div>
