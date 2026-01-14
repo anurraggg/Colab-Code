@@ -1,59 +1,48 @@
-// import React, { useRef, useEffect, useState } from 'react';
-import React from 'react';
-// import Editor, { type OnMount } from '@monaco-editor/react';
-// import * as Y from 'yjs';
-// import { WebsocketProvider } from 'y-websocket';
-// import { MonacoBinding } from 'y-monaco';
-import { FileExplorer } from './FileExplorer';
-import { TabBar } from './TabBar';
-import type { FileTree, User } from '../types';
-// import { v4 as uuidv4 } from 'uuid';
+import React, { useRef, useEffect, useState } from 'react';
+import Editor, { type OnMount } from '@monaco-editor/react';
+import * as Y from 'yjs';
+import { WebsocketProvider } from 'y-websocket';
+import { MonacoBinding } from 'y-monaco';
+import type { User } from '../types';
 
 interface EditorProps {
     roomId: string;
     user: User;
 }
 
-
-
-/* const getRandomColor = () => {
+const getRandomColor = () => {
     const colors = ['#f44336', '#e91e63', '#9c27b0', '#673ab7', '#3f51b5', '#2196f3', '#03a9f4', '#00bcd4', '#009688', '#4caf50', '#8bc34a', '#cddc39', '#ffeb3b', '#ffc107', '#ff9800', '#ff5722'];
     return colors[Math.floor(Math.random() * colors.length)];
-}; */
+};
 
-export const CodeEditor: React.FC<EditorProps> = ({ /* roomId, user */ }) => {
-    // Temporary dummy state for rendering
-    const files: FileTree = {};
-    const activeFileId = null;
-    const openFiles: string[] = [];
-    const language: string = 'javascript';
-    const activeUsers: any[] = [];
-    const output = '';
-    const isRunning = false;
+export const CodeEditor: React.FC<EditorProps> = ({ roomId, user }) => {
+    const editorRef = useRef<any>(null);
+    const [provider, setProvider] = useState<WebsocketProvider | null>(null);
+    const [binding, setBinding] = useState<MonacoBinding | null>(null);
+    const [doc, setDoc] = useState<Y.Doc | null>(null);
+    const [language, setLanguage] = useState('javascript');
+    const [yOutput, setYOutput] = useState<Y.Text | null>(null);
+    const [activeUsers, setActiveUsers] = useState<any[]>([]);
+    const [output, setOutput] = useState<string>('');
+    const [isRunning, setIsRunning] = useState(false);
 
     // Refs
-    /* const editorRef = useRef<any>(null);
     const languageRef = useRef(language);
     const runCodeRef = useRef<() => void>(() => { });
-    const activeFileIdRef = useRef(activeFileId); */
 
-    /* useEffect(() => {
+    useEffect(() => {
         languageRef.current = language;
     }, [language]);
 
     useEffect(() => {
-        activeFileIdRef.current = activeFileId;
-    }, [activeFileId]); */
-
-    /* useEffect(() => {
         return () => {
             if (provider) provider.destroy();
             if (binding) binding.destroy();
             if (doc) doc.destroy();
         };
-    }, []); */
+    }, []);
 
-    /* const handleEditorDidMount: OnMount = (editor, monaco) => {
+    const handleEditorDidMount: OnMount = (editor, monaco) => {
         editorRef.current = editor;
         const ydoc = new Y.Doc();
         setDoc(ydoc);
@@ -75,27 +64,24 @@ export const CodeEditor: React.FC<EditorProps> = ({ /* roomId, user */ }) => {
             setActiveUsers(users);
         });
 
-        const fileTreeMap = ydoc.getMap<FileNode>('fileTree');
+        const yText = ydoc.getText('monaco');
         const outputText = ydoc.getText('output');
         setYOutput(outputText);
 
-        // Sync File Tree
-        const updateFiles = () => {
-            setFiles(fileTreeMap.toJSON() as FileTree);
-        };
-        fileTreeMap.observe(updateFiles);
+        const monacoBinding = new MonacoBinding(
+            yText,
+            editor.getModel()!,
+            new Set([editor]),
+            wsProvider.awareness
+        );
+        setBinding(monacoBinding);
 
         // Initial Sync
         wsProvider.on('sync', (isSynced: boolean) => {
             if (isSynced) {
-                if (fileTreeMap.size === 0) {
-                    // Initialize default file if empty
-                    const mainId = uuidv4();
-                    const mainFile: FileNode = { id: mainId, name: 'main.js', type: 'file', language: 'javascript' };
-                    fileTreeMap.set(mainId, mainFile);
-                    ydoc.getText(mainId).insert(0, '// Welcome to Colab Code!\nconsole.log("Hello World");');
+                if (yText.toString() === '') {
+                    yText.insert(0, '// Welcome to Colab Code!\nconsole.log("Hello World");');
                 }
-                updateFiles();
             }
         });
 
@@ -109,104 +95,10 @@ export const CodeEditor: React.FC<EditorProps> = ({ /* roomId, user */ }) => {
         editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, () => {
             runCodeRef.current();
         });
-    }; */
-
-    // Handle File Switching
-    /* useEffect(() => {
-        if (!doc || !provider || !editorRef.current || !activeFileId) return;
-
-        // Destroy old binding
-        if (binding) {
-            binding.destroy();
-        }
-
-        const file = files[activeFileId];
-        if (!file) return;
-
-        // Update Language
-        const lang = file.language || 'javascript';
-        setLanguage(lang);
-
-        // Create new binding
-        const yText = doc.getText(activeFileId);
-        const monacoBinding = new MonacoBinding(
-            yText,
-            editorRef.current.getModel()!,
-            new Set([editorRef.current]),
-            provider.awareness
-        );
-        setBinding(monacoBinding);
-
-    }, [activeFileId, doc, provider, files]); // Re-run when active file changes */
-
-    // Set initial active file
-    /* useEffect(() => {
-        if (!activeFileId && Object.keys(files).length > 0) {
-            const firstFileId = Object.keys(files)[0];
-            setActiveFileId(firstFileId);
-            setOpenFiles([firstFileId]);
-        }
-    }, [files]); */
-
-    /* const handleFileSelect = (fileId: string) => {
-        setActiveFileId(fileId);
-        if (!openFiles.includes(fileId)) {
-            setOpenFiles([...openFiles, fileId]);
-        }
     };
 
-    const handleCreateFile = (name: string, type: 'file' | 'folder') => {
-        if (!doc) return;
-        const id = uuidv4();
-        const fileTreeMap = doc.getMap<FileNode>('fileTree');
-
-        // Simple language detection
-        let lang = 'javascript';
-        if (name.endsWith('.html')) lang = 'html';
-        else if (name.endsWith('.css')) lang = 'css';
-        else if (name.endsWith('.py')) lang = 'python';
-        else if (name.endsWith('.json')) lang = 'json';
-        else if (name.endsWith('.ts')) lang = 'typescript';
-        else if (name.endsWith('.java')) lang = 'java';
-
-        const newNode: FileNode = { id, name, type, language: lang };
-        fileTreeMap.set(id, newNode);
-
-        if (type === 'file') {
-            doc.getText(id).insert(0, ''); // Init empty content
-            handleFileSelect(id);
-        }
-    };
-
-    const handleDeleteFile = (fileId: string) => {
-        if (!doc) return;
-        const fileTreeMap = doc.getMap<FileNode>('fileTree');
-        fileTreeMap.delete(fileId);
-
-        // Close tab if open
-        if (openFiles.includes(fileId)) {
-            const newOpen = openFiles.filter(id => id !== fileId);
-            setOpenFiles(newOpen);
-            if (activeFileId === fileId) {
-                setActiveFileId(newOpen.length > 0 ? newOpen[0] : null);
-            }
-        }
-    };
-
-    const handleCloseTab = (fileId: string) => {
-        const newOpen = openFiles.filter(id => id !== fileId);
-        setOpenFiles(newOpen);
-        if (activeFileId === fileId) {
-            setActiveFileId(newOpen.length > 0 ? newOpen[0] : null);
-        }
-    }; */
-    const handleFileSelect = () => { };
-    const handleCreateFile = () => { };
-    const handleDeleteFile = () => { };
-    const handleCloseTab = () => { };
-
-    /* const runCode = async () => {
-        if (!editorRef.current || !yOutput || !activeFileId) return;
+    const runCode = async () => {
+        if (!editorRef.current || !yOutput) return;
         setIsRunning(true);
 
         const sourceCode = editorRef.current.getValue();
@@ -261,108 +153,92 @@ export const CodeEditor: React.FC<EditorProps> = ({ /* roomId, user */ }) => {
     // Update ref so shortcut calls latest version
     useEffect(() => {
         runCodeRef.current = runCode;
-    }, [runCode]); */
-    const runCode = () => { };
+    }, [runCode]);
 
     return (
-        <div className="editor-container" style={{ height: 'calc(100vh - 60px)' }}>
-            {/* File Explorer Sidebar */}
-            <FileExplorer
-                files={files}
-                activeFileId={activeFileId}
-                onFileSelect={handleFileSelect}
-                onCreateFile={handleCreateFile}
-                onDeleteFile={handleDeleteFile}
-            />
-
-            {/* Main Editor Area */}
-            <div className="editor-main">
-                <TabBar
-                    openFiles={openFiles}
-                    activeFileId={activeFileId}
-                    files={files}
-                    onSelect={handleFileSelect}
-                    onClose={handleCloseTab}
-                />
-
-                <div className="editor-toolbar">
-                    <div className="toolbar-left">
-                        <span style={{ color: '#888', fontSize: '0.9rem', marginRight: '10px' }}>
-                            {language.toUpperCase()}
-                        </span>
-                        <button
-                            onClick={runCode}
-                            disabled={isRunning}
-                            title="Ctrl+Enter to run"
-                            className="run-btn"
-                        >
-                            {isRunning ? (
-                                <>
-                                    <span className="spinner">⌛</span> Running...
-                                </>
-                            ) : (
-                                <>
-                                    <span>▶</span> Run Code
-                                </>
-                            )}
-                        </button>
-                    </div>
-
-                    <div className="active-users">
-                        <span style={{ color: '#888', marginRight: '10px', fontSize: '0.8rem' }}>Active:</span>
-                        {activeUsers.map((u, i) => (
-                            <div key={i} title={u.name} className="active-user-avatar" style={{
-                                borderColor: u.color,
-                                boxShadow: `0 0 10px ${u.color}40`
-                            }}>
-                                {u.avatar ? (
-                                    <img src={u.avatar} alt={u.name} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
-                                ) : (
-                                    u.name.charAt(0).toUpperCase()
-                                )}
-                            </div>
-                        ))}
-                    </div>
-                </div>
-
-                <div className="code-editor-wrapper">
-                    <div style={{ width: '100%', height: '100%', background: 'blue', color: 'white', fontSize: '2rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        TEST EDITOR COMPONENT
-                    </div>
-                    {/* <Editor
-                        height="100%"
-                        loading="Loading Editor..."
-                        language={language}
-                        defaultValue="// Select a file to start coding..."
-                        theme="vs-dark"
-                        onMount={handleEditorDidMount}
-                        options={{
-                            minimap: { enabled: false },
-                            fontSize: 14,
-                            fontFamily: "'JetBrains Mono', monospace",
-                            fontLigatures: true,
-                            automaticLayout: true,
-                            scrollBeyondLastLine: false,
-                            padding: { top: 16, bottom: 16 },
-                        }}
-                    /> */}
-                </div>
-
-                {/* Output Panel */}
-                <div className="output-panel">
-                    <div className="output-header">Terminal Output</div>
-                    <div className="output-content" style={{ padding: language === 'html' ? 0 : '1rem', background: language === 'html' ? '#fff' : 'transparent' }}>
-                        {language === 'html' ? (
-                            <iframe
-                                srcDoc={output}
-                                title="preview"
-                                style={{ width: '100%', height: '100%', border: 'none' }}
-                                sandbox="allow-scripts"
-                            />
+        <div className="editor-container">
+            <div className="editor-toolbar">
+                <div className="toolbar-left">
+                    <select
+                        value={language}
+                        onChange={(e) => setLanguage(e.target.value)}
+                        className="language-select"
+                    >
+                        <option value="javascript">JavaScript</option>
+                        <option value="python">Python</option>
+                        <option value="html">HTML</option>
+                        <option value="java">Java</option>
+                        <option value="cpp">C++</option>
+                    </select>
+                    <button
+                        onClick={runCode}
+                        disabled={isRunning}
+                        title="Ctrl+Enter to run"
+                        className="run-btn"
+                    >
+                        {isRunning ? (
+                            <>
+                                <span className="spinner">⌛</span> Running...
+                            </>
                         ) : (
-                            output || <span style={{ color: '#444' }}>// Output will appear here...</span>
+                            <>
+                                <span>▶</span> Run Code
+                            </>
                         )}
-                    </div>
+                    </button>
+                </div>
+
+                <div className="active-users">
+                    <span style={{ color: '#888', marginRight: '10px', fontSize: '0.8rem' }}>Active:</span>
+                    {activeUsers.map((u, i) => (
+                        <div key={i} title={u.name} className="active-user-avatar" style={{
+                            borderColor: u.color,
+                            boxShadow: `0 0 10px ${u.color}40`
+                        }}>
+                            {u.avatar ? (
+                                <img src={u.avatar} alt={u.name} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
+                            ) : (
+                                u.name.charAt(0).toUpperCase()
+                            )}
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            <div className="code-editor-wrapper">
+                <Editor
+                    height="100%"
+                    loading="Loading Editor..."
+                    language={language}
+                    defaultValue="// Loading..."
+                    theme="vs-dark"
+                    onMount={handleEditorDidMount}
+                    options={{
+                        minimap: { enabled: false },
+                        fontSize: 14,
+                        fontFamily: "'JetBrains Mono', monospace",
+                        fontLigatures: true,
+                        automaticLayout: true,
+                        scrollBeyondLastLine: false,
+                        padding: { top: 16, bottom: 16 },
+                    }}
+                />
+            </div>
+
+            {/* Output Panel */}
+            <div className="output-panel">
+                <div className="output-header">Terminal Output</div>
+                <div className="output-content" style={{ padding: language === 'html' ? 0 : '1rem', background: language === 'html' ? '#fff' : 'transparent' }}>
+                    {language === 'html' ? (
+                        <iframe
+                            srcDoc={output}
+                            title="preview"
+                            style={{ width: '100%', height: '100%', border: 'none' }}
+                            sandbox="allow-scripts"
+                        />
+                    ) : (
+                        output || <span style={{ color: '#444' }}>// Output will appear here...</span>
+                    )}
                 </div>
             </div>
         </div>
