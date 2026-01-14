@@ -516,3 +516,29 @@ h2 {
     transform: translateY(0);
   }
 }
+
+/* Layout Adjustments */
+.editor-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.editor-toolbar {
+  flex-shrink: 0;
+}
+
+.code-editor-wrapper {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.output-panel {
+  flex-shrink: 0;
+  /* Height is defined in .output-panel rule above (200px) */
+}

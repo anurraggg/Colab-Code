@@ -11,6 +11,7 @@ interface User {
 
 function App() {
   const [roomId, setRoomId] = useState('');
+  const [roomId, setRoomId] = useState('');
   const [joined, setJoined] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
